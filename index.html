@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCU Canva 教育版 - 教師資格申請</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-purple-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- 申請表單區塊 -->
+    <div id="formSection" class="bg-white rounded-2xl shadow-xl p-8 max-w-lg w-full">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Canva 教育版</h1>
+            <p class="text-indigo-600 font-semibold mt-1">教師資格登記申請</p>
+        </div>
+
+        <form id="applyForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">真實姓名 <span class="text-red-500">*</span></label>
+                <input type="text" id="userName" required class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">所屬單位 / 系所 <span class="text-red-500">*</span></label>
+                <input type="text" id="userDept" required class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">身分別 <span class="text-red-500">*</span></label>
+                <select id="userRole" required class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="">請選擇...</option>
+                    <option value="專任/兼任教師">專任/兼任教師</option>
+                    <option value="行政/技術人員">行政/技術人員</option>
+                    <option value="課程助教 (TA)">課程助教 (TA)</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">已加入團隊的 Canva Email <span class="text-red-500">*</span></label>
+                <input type="email" id="userEmail" required class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                <p class="text-xs text-gray-500 mt-1">【重要】請填寫您登入 Canva 並加入團隊所使用的 Email。若未加入請先點擊邀請連結！</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Canva 顯示名稱（選填）</label>
+                <input type="text" id="canvaName" class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <div class="pt-2">
+                <label class="flex items-start gap-2 cursor-pointer">
+                    <input type="checkbox" required class="mt-1 rounded text-indigo-600 focus:ring-indigo-500">
+                    <span class="text-sm text-gray-700">我已確認已點擊學校專屬連結加入團隊，並知悉送出後需由管理員指派變更角色。</span>
+                </label>
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-4">
+                送出申請
+            </button>
+        </form>
+    </div>
+
+    <!-- 成功畫面區塊 (預設隱藏) -->
+    <div id="successSection" class="hidden bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full text-center">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">申請已送出！</h2>
+        <p class="text-gray-600 text-sm">管理員將於 1～2 個工作天內為您進行資格開通，屆時您的 Canva 介面左側將會出現「班級」功能。</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // 已替換為您的專屬金鑰
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7XTGYheH4CsvF9MCpUG-6FidgpJCbUtU",
+            authDomain: "ncu-canva-edu.firebaseapp.com",
+            projectId: "ncu-canva-edu",
+            storageBucket: "ncu-canva-edu.firebasestorage.app",
+            messagingSenderId: "529775289541",
+            appId: "1:529775289541:web:a4db78c975b698e3017cac",
+            measurementId: "G-CQL8RDMXP7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('applyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerText = '處理中...';
+
+            try {
+                await addDoc(collection(db, "canva_applications"), {
+                    name: document.getElementById('userName').value,
+                    dept: document.getElementById('userDept').value,
+                    role: document.getElementById('userRole').value,
+                    email: document.getElementById('userEmail').value,
+                    canvaName: document.getElementById('canvaName').value,
+                    status: 'pending', 
+                    createdAt: serverTimestamp(),
+                    isAnonymized: false
+                });
+
+                document.getElementById('formSection').classList.add('hidden');
+                document.getElementById('successSection').classList.remove('hidden');
+            } catch (error) {
+                console.error("寫入錯誤: ", error);
+                alert('發生錯誤，請稍後再試。');
+                btn.disabled = false;
+                btn.innerText = '送出申請';
+            }
+        });
+    </script>
+</body>
+</html>
